@@ -27,7 +27,7 @@ Requirements:
 - shadcn `Tabs`:
   - My Projects
   - Shared
-- both taabs show empty placeholder state
+- both tabs show empty placeholder state
 - full-width `New Project` button at the bottom with `Plus` icon
 
 ### Dialog Pattern
