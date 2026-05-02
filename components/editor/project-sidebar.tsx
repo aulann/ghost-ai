@@ -4,12 +4,7 @@ import { Plus, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ProjectSidebarProps {
   isOpen: boolean;
@@ -23,7 +18,7 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
         "fixed top-0 left-0 z-50 flex h-full w-72 flex-col",
         "bg-surface border-r border-surface-border",
         "transition-transform duration-300 ease-in-out",
-        isOpen ? "translate-x-0" : "-translate-x-full"
+        isOpen ? "translate-x-0" : "-translate-x-full",
       )}
     >
       <div className="flex h-12 shrink-0 items-center justify-between border-b border-surface-border px-4">
@@ -32,6 +27,7 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
           variant="ghost"
           size="icon"
           onClick={onClose}
+          aria-label="Close project sidebar"
           className="h-7 w-7 text-copy-muted hover:text-copy-primary hover:bg-elevated"
         >
           <X className="h-4 w-4" />
@@ -50,7 +46,9 @@ export function ProjectSidebar({ isOpen, onClose }: ProjectSidebarProps) {
           value="my-projects"
           className="flex flex-1 items-center justify-center"
         >
-          <p className="text-center text-sm text-copy-muted">No projects yet.</p>
+          <p className="text-center text-sm text-copy-muted">
+            No projects yet.
+          </p>
         </TabsContent>
         <TabsContent
           value="shared"
