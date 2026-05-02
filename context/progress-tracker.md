@@ -8,11 +8,12 @@ Update this file whenever the current phase, active feature, or implementation s
 
 ## Current Goal
 
-- Feature 02: next planned feature unit.
+- Feature 03: next planned feature unit.
 
 ## Completed
 
 - Feature 01: Design system — shadcn/ui initialized, lucide-react installed, all 7 UI primitives added (Button, Card, Dialog, Input, Tabs, Textarea, ScrollArea), `lib/utils.ts` with `cn()` created, `globals.css` set up with project dark theme tokens and fixed font mapping, `dark` class applied to `<html>`.
+- Feature 02: Editor chrome — `components/editor/editor-navbar.tsx` (fixed top bar, left/center/right sections, sidebar toggle with `PanelLeftOpen`/`PanelLeftClose`) and `components/editor/project-sidebar.tsx` (fixed overlay, slides in from left, `isOpen`/`onClose` props, Projects header, My Projects + Shared tabs with empty states, full-width New Project button). Shadcn Dialog already supports title/description/footer — no new dialog built.
 
 ## In Progress
 
