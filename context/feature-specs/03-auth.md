@@ -34,11 +34,11 @@ Update `/`:
 - authenticated users redirect to `/editor`
 - unauthenticated users redirect to `/sign-in`
 
-Add Clerk's built-in `UserButton` to the editor navbar right setion for profile settings and logout.
+Add Clerk's built-in `UserButton` to the editor navbar right section for profile settings and logout.
 
 Keep Clerk's default user menu and profile flows intact. Do not rebuild or heavily customize Clerk internals.
 
-Use existing Clerk env vars. Do not rename or onvent new ones.
+Use existing Clerk env vars. Do not rename or invent new ones.
 
 ## Dependencies
 
