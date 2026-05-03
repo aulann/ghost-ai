@@ -20,7 +20,7 @@ When creating:
 
 Security:
 
-- unauthicated requests return `401`
+- unauthenticated requests return `401`
 - only the project owner can rename or delete
 - non-owner mutations return `403`
 

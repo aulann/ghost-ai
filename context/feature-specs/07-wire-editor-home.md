@@ -10,7 +10,7 @@ No client-side fetching for initial load.
 
 ### `Use Project Actions`
 
-Create a hook in `hooks/` that menages dialog state and project mutations.
+Create a hook in `hooks/` that manages dialog state and project mutations.
 
 **Create**
 
