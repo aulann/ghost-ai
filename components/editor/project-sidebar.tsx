@@ -1,10 +1,10 @@
 "use client";
 
 import { Pencil, Plus, Trash2, X } from "lucide-react";
+import Link from "next/link";
 
 import { cn } from "@/lib/utils";
-import { MOCK_PROJECTS } from "@/lib/mock-projects";
-import type { Project } from "@/hooks/use-project-dialogs";
+import type { Project } from "@/hooks/use-project-actions";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -14,10 +14,9 @@ interface ProjectSidebarProps {
   onCreateProject: () => void;
   onRenameProject: (project: Project) => void;
   onDeleteProject: (project: Project) => void;
+  ownedProjects: Project[];
+  sharedProjects: Project[];
 }
-
-const ownedProjects = MOCK_PROJECTS.filter((p) => p.role === "owner");
-const sharedProjects = MOCK_PROJECTS.filter((p) => p.role === "collaborator");
 
 export function ProjectSidebar({
   isOpen,
@@ -25,6 +24,8 @@ export function ProjectSidebar({
   onCreateProject,
   onRenameProject,
   onDeleteProject,
+  ownedProjects,
+  sharedProjects,
 }: ProjectSidebarProps) {
   return (
     <>
@@ -115,8 +116,13 @@ interface ProjectItemProps {
 
 function ProjectItem({ project, onRename, onDelete }: ProjectItemProps) {
   return (
-    <div className="group flex cursor-pointer items-center gap-1 rounded-xl px-2 py-1.5 hover:bg-elevated">
-      <span className="flex-1 truncate text-sm text-copy-primary">{project.name}</span>
+    <div className="group flex items-center gap-1 rounded-xl px-2 py-1.5 hover:bg-elevated">
+      <Link
+        href={`/editor/${project.id}`}
+        className="flex-1 truncate text-sm text-copy-primary"
+      >
+        {project.name}
+      </Link>
       <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
         <Button
           variant="ghost"
@@ -147,8 +153,11 @@ interface SharedProjectItemProps {
 
 function SharedProjectItem({ project }: SharedProjectItemProps) {
   return (
-    <div className="flex cursor-pointer items-center gap-1 rounded-xl px-2 py-1.5 hover:bg-elevated">
+    <Link
+      href={`/editor/${project.id}`}
+      className="flex items-center gap-1 rounded-xl px-2 py-1.5 hover:bg-elevated"
+    >
       <span className="flex-1 truncate text-sm text-copy-primary">{project.name}</span>
-    </div>
+    </Link>
   );
 }

@@ -16,16 +16,9 @@ interface CreateProjectDialogProps {
   onClose: () => void;
   name: string;
   onNameChange: (v: string) => void;
+  roomIdPreview: string;
   onConfirm: () => void;
   loading: boolean;
-}
-
-function toSlug(name: string): string {
-  return name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "");
 }
 
 export function CreateProjectDialog({
@@ -33,11 +26,10 @@ export function CreateProjectDialog({
   onClose,
   name,
   onNameChange,
+  roomIdPreview,
   onConfirm,
   loading,
 }: CreateProjectDialogProps) {
-  const slug = toSlug(name);
-
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent showCloseButton={false} className="rounded-3xl sm:max-w-md">
@@ -53,20 +45,20 @@ export function CreateProjectDialog({
             value={name}
             onChange={(e) => onNameChange(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter" && slug && !loading) onConfirm();
+              if (e.key === "Enter" && roomIdPreview && !loading) onConfirm();
             }}
             className="border-surface-border text-copy-primary"
             autoFocus
           />
-          {slug && (
-            <p className="font-mono text-xs text-copy-secondary">{slug}</p>
+          {roomIdPreview && (
+            <p className="font-mono text-xs text-copy-secondary">{roomIdPreview}</p>
           )}
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose} disabled={loading}>
             Cancel
           </Button>
-          <Button onClick={onConfirm} disabled={!slug || loading}>
+          <Button onClick={onConfirm} disabled={!roomIdPreview || loading}>
             Create project
           </Button>
         </DialogFooter>
