@@ -10,6 +10,8 @@
 !.yarn/releases
 !.yarn/versions
 /context/current-issues.md
+/.agents
+/.claude
 
 # testing
 /coverage
@@ -40,3 +42,5 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/app/generated/prisma
