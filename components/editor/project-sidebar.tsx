@@ -2,6 +2,7 @@
 
 import { Pencil, Plus, Trash2, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import type { Project } from "@/hooks/use-project-actions";
@@ -27,6 +28,11 @@ export function ProjectSidebar({
   ownedProjects,
   sharedProjects,
 }: ProjectSidebarProps) {
+  const pathname = usePathname();
+  const activeId = pathname.startsWith("/editor/")
+    ? pathname.split("/")[2]
+    : undefined;
+
   return (
     <>
       {isOpen && (
@@ -77,6 +83,7 @@ export function ProjectSidebar({
                 <ProjectItem
                   key={project.id}
                   project={project}
+                  isActive={project.id === activeId}
                   onRename={onRenameProject}
                   onDelete={onDeleteProject}
                 />
@@ -91,7 +98,11 @@ export function ProjectSidebar({
               </div>
             ) : (
               sharedProjects.map((project) => (
-                <SharedProjectItem key={project.id} project={project} />
+                <SharedProjectItem
+                  key={project.id}
+                  project={project}
+                  isActive={project.id === activeId}
+                />
               ))
             )}
           </TabsContent>
@@ -110,16 +121,28 @@ export function ProjectSidebar({
 
 interface ProjectItemProps {
   project: Project;
+  isActive: boolean;
   onRename: (project: Project) => void;
   onDelete: (project: Project) => void;
 }
 
-function ProjectItem({ project, onRename, onDelete }: ProjectItemProps) {
+function ProjectItem({ project, isActive, onRename, onDelete }: ProjectItemProps) {
   return (
-    <div className="group flex items-center gap-1 rounded-xl px-2 py-1.5 hover:bg-elevated">
+    <div
+      className={cn(
+        "group flex items-center gap-1 rounded-xl px-2 py-1.5 hover:bg-elevated",
+        isActive && "bg-elevated",
+      )}
+    >
+      {isActive && (
+        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
+      )}
       <Link
         href={`/editor/${project.id}`}
-        className="flex-1 truncate text-sm text-copy-primary"
+        className={cn(
+          "flex-1 truncate text-sm",
+          isActive ? "font-medium text-copy-primary" : "text-copy-primary",
+        )}
       >
         {project.name}
       </Link>
@@ -149,15 +172,26 @@ function ProjectItem({ project, onRename, onDelete }: ProjectItemProps) {
 
 interface SharedProjectItemProps {
   project: Project;
+  isActive: boolean;
 }
 
-function SharedProjectItem({ project }: SharedProjectItemProps) {
+function SharedProjectItem({ project, isActive }: SharedProjectItemProps) {
   return (
     <Link
       href={`/editor/${project.id}`}
-      className="flex items-center gap-1 rounded-xl px-2 py-1.5 hover:bg-elevated"
+      className={cn(
+        "flex items-center gap-1 rounded-xl px-2 py-1.5 hover:bg-elevated",
+        isActive && "bg-elevated",
+      )}
     >
-      <span className="flex-1 truncate text-sm text-copy-primary">{project.name}</span>
+      <span
+        className={cn(
+          "flex-1 truncate text-sm text-copy-primary",
+          isActive && "font-medium",
+        )}
+      >
+        {project.name}
+      </span>
     </Link>
   );
 }

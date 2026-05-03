@@ -4,6 +4,12 @@ import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
 
+function normalizeSslMode(url: string): string {
+  // pg-connection-string treats prefer/require/verify-ca as verify-full already,
+  // but emits a deprecation warning. Make that explicit to suppress it.
+  return url.replace(/\bsslmode=(prefer|require|verify-ca)\b/, "sslmode=verify-full");
+}
+
 function createClient(): PrismaClient {
   const url = process.env.DATABASE_URL?.trim();
   if (!url) {
@@ -14,7 +20,7 @@ function createClient(): PrismaClient {
     return new PrismaClient({ accelerateUrl: url });
   }
 
-  const pool = new Pool({ connectionString: url });
+  const pool = new Pool({ connectionString: normalizeSslMode(url) });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });
 }
