@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 import { EditorNavbar } from "@/components/editor/editor-navbar";
@@ -12,6 +12,7 @@ import { ProjectShareDialog } from "@/components/editor/dialogs/project-share-di
 import { useProjectActions } from "@/hooks/use-project-actions";
 import { ProjectDialogContext } from "@/components/editor/project-dialog-context";
 import { WorkspaceContext } from "@/components/editor/workspace-context";
+import type { SaveStatus } from "@/hooks/use-canvas-autosave";
 import type { Project } from "@/hooks/use-project-actions";
 
 interface EditorShellProps {
@@ -33,10 +34,25 @@ export function EditorShell({
   const [aiOpen, setAiOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [templatesOpen, setTemplatesOpen] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const actions = useProjectActions();
   const activeProjectId = pathname.startsWith("/editor/")
     ? pathname.split("/")[2] || null
     : null;
+
+  // Store the canvas save function in a ref to avoid function-in-state issues.
+  // CanvasFlow registers it via setTriggerSave; EditorNavbar calls triggerSave.
+  const saveFnRef = useRef<(() => void) | null>(null);
+  const setTriggerSave = useCallback((fn: (() => void) | null) => {
+    saveFnRef.current = fn;
+  }, []);
+  const triggerSave = useCallback(() => saveFnRef.current?.(), []);
+
+  // Clear stale save callback immediately when the active project changes,
+  // before the old CanvasFlow has a chance to unmount and clean up itself.
+  useEffect(() => {
+    saveFnRef.current = null;
+  }, [activeProjectId]);
 
   return (
     <ProjectDialogContext.Provider value={{ openCreate: actions.openCreate }}>
@@ -48,6 +64,9 @@ export function EditorShell({
           templatesOpen,
           openTemplates: () => setTemplatesOpen(true),
           closeTemplates: () => setTemplatesOpen(false),
+          saveStatus,
+          setSaveStatus,
+          setTriggerSave,
         }}
       >
         <div className="flex h-screen flex-col overflow-hidden bg-base">
@@ -59,6 +78,8 @@ export function EditorShell({
             onAiToggle={() => setAiOpen((v) => !v)}
             onShareOpen={() => setShareOpen(true)}
             onTemplatesOpen={() => setTemplatesOpen(true)}
+            saveStatus={saveStatus}
+            onSave={triggerSave}
           />
           <div className="relative flex flex-1 overflow-hidden">
             <ProjectSidebar

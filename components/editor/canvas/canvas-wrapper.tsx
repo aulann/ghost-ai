@@ -7,18 +7,19 @@ import { CanvasFlow } from "./canvas-flow";
 
 interface CanvasWrapperProps {
   roomId: string;
+  projectId: string;
 }
 
-export function CanvasWrapper({ roomId }: CanvasWrapperProps) {
+export function CanvasWrapper({ roomId, projectId }: CanvasWrapperProps) {
   return (
     <LiveblocksProvider authEndpoint="/api/liveblocks-auth">
       <RoomProvider
         id={roomId}
-        initialPresence={{ cursor: null, isThinking: false }}
+        initialPresence={{ cursor: null, thinking: false }}
       >
         <CanvasErrorBoundary fallback={<CanvasError />}>
           <ClientSideSuspense fallback={<CanvasLoading />}>
-            <CanvasFlow />
+            <CanvasFlow projectId={projectId} />
           </ClientSideSuspense>
         </CanvasErrorBoundary>
       </RoomProvider>
