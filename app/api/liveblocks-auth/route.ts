@@ -10,8 +10,18 @@ export async function POST(request: Request) {
     return new NextResponse(null, { status: 401 });
   }
 
-  const { room } = await request.json();
-  if (typeof room !== "string" || !room) {
+  let parsed: unknown;
+  try {
+    parsed = await request.json();
+  } catch {
+    return new NextResponse(null, { status: 400 });
+  }
+
+  const room =
+    parsed !== null && typeof parsed === "object" && "room" in parsed
+      ? String((parsed as Record<string, unknown>).room ?? "").trim()
+      : "";
+  if (!room) {
     return new NextResponse(null, { status: 400 });
   }
 
