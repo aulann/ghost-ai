@@ -78,7 +78,7 @@ export function EditorNavbar({
               variant="outline"
               size="sm"
               onClick={onSave}
-              disabled={isSaving}
+              disabled={isSaving || !onSave}
               className={cn(
                 "w-22 gap-1.5",
                 isSaved && "border-brand/50 text-brand",
@@ -91,7 +91,13 @@ export function EditorNavbar({
               {!isSaving && !isSaved && !isError && (
                 <Save className="h-3.5 w-3.5" />
               )}
-              {isSaving ? "Saving…" : isSaved ? "Saved" : isError ? "Error" : "Save"}
+              {isSaving
+                ? "Saving…"
+                : isSaved
+                  ? "Saved"
+                  : isError
+                    ? "Error"
+                    : "Save"}
             </Button>
 
             <Button

@@ -46,7 +46,12 @@ function withDimensions(n: CanvasNode): CanvasNode {
   const w = n.width ?? n.data.width;
   const h = n.height ?? n.data.height;
   if (w == null || h == null) return n;
-  return { ...n, width: w, height: h, style: { ...n.style, width: w, height: h } };
+  return {
+    ...n,
+    width: w,
+    height: h,
+    style: { ...n.style, width: w, height: h },
+  };
 }
 
 interface CanvasFlowProps {
@@ -68,10 +73,16 @@ export function CanvasFlow({ projectId }: CanvasFlowProps) {
   const rfInstanceRef = useRef(rfInstance);
   rfInstanceRef.current = rfInstance;
 
+  const nodesRef = useRef(nodes);
+  nodesRef.current = nodes;
+  const edgesRef = useRef(edges);
+  edgesRef.current = edges;
+
   const undo = useUndo();
   const redo = useRedo();
   const updateMyPresence = useUpdateMyPresence();
-  const { templatesOpen, closeTemplates, setSaveStatus, setTriggerSave } = useWorkspace();
+  const { templatesOpen, closeTemplates, setSaveStatus, setTriggerSave } =
+    useWorkspace();
 
   // Normalize legacy handle IDs and load saved canvas once on mount
   const initialLoadDone = useRef(false);
@@ -119,22 +130,50 @@ export function CanvasFlow({ projectId }: CanvasFlowProps) {
     fetch(`/api/projects/${projectId}/canvas`)
       .then((r) => (r.ok ? r.json() : { nodes: [], edges: [] }))
       .then((data: { nodes?: CanvasNode[]; edges?: CanvasEdge[] }) => {
+        // Re-check live refs — a collaborator may have added content while the fetch was in flight
+        if (nodesRef.current.length > 0 || edgesRef.current.length > 0) return;
         const savedNodes = Array.isArray(data.nodes) ? data.nodes : [];
         const savedEdges = Array.isArray(data.edges) ? data.edges : [];
         if (savedNodes.length === 0 && savedEdges.length === 0) return;
         if (savedNodes.length > 0) {
-          onNodesChange(savedNodes.map((n) => ({ type: "add" as const, item: withDimensions(n) })));
+          onNodesChange(
+            savedNodes.map((n) => ({
+              type: "add" as const,
+              item: withDimensions(n),
+            })),
+          );
         }
+
+        const remapHandle = (handle?: string | null) =>
+          handle ? (legacyHandleMap[handle] ?? handle) : handle;
+
         if (savedEdges.length > 0) {
-          onEdgesChange(savedEdges.map((e) => ({ type: "add" as const, item: e })));
+          onEdgesChange(
+            savedEdges.map((e) => ({
+              type: "add" as const,
+              item: {
+                ...e,
+                sourceHandle: remapHandle(e.sourceHandle),
+                targetHandle: remapHandle(e.targetHandle),
+              },
+            })),
+          );
         }
-        setTimeout(() => rfInstanceRef.current?.fitView({ duration: 400 }), 150);
+        setTimeout(
+          () => rfInstanceRef.current?.fitView({ duration: 400 }),
+          150,
+        );
       })
       .catch(() => {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const { save } = useCanvasAutosave({ projectId, nodes, edges, onStatusChange: setSaveStatus });
+  const { save } = useCanvasAutosave({
+    projectId,
+    nodes,
+    edges,
+    onStatusChange: setSaveStatus,
+  });
 
   useEffect(() => {
     setTriggerSave(save);
@@ -172,7 +211,10 @@ export function CanvasFlow({ projectId }: CanvasFlowProps) {
       if (removeNodes.length) onNodesChange(removeNodes);
       if (removeEdges.length) onEdgesChange(removeEdges);
       onNodesChange(
-        template.nodes.map((nd) => ({ type: "add" as const, item: withDimensions(nd) })),
+        template.nodes.map((nd) => ({
+          type: "add" as const,
+          item: withDimensions(nd),
+        })),
       );
       onEdgesChange(
         template.edges.map((ed) => ({ type: "add" as const, item: ed })),

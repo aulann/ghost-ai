@@ -2,7 +2,7 @@
 
 import { createPortal } from "react-dom";
 import { useOthers } from "@liveblocks/react";
-import { useReactFlow } from "@xyflow/react";
+import { useReactFlow, useViewport } from "@xyflow/react";
 
 function CursorIcon({ color }: { color: string }) {
   return (
@@ -27,6 +27,7 @@ function CursorIcon({ color }: { color: string }) {
 export function LiveCursors() {
   const others = useOthers();
   const { flowToScreenPosition } = useReactFlow();
+  useViewport(); // re-render on pan/zoom so flowToScreenPosition stays accurate
 
   if (typeof document === "undefined") return null;
 

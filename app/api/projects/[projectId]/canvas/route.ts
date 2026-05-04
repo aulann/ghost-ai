@@ -38,7 +38,9 @@ export async function GET(
   const blobHeaders: HeadersInit = process.env.BLOB_READ_WRITE_TOKEN
     ? { Authorization: `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}` }
     : {};
-  const blobRes = await fetch(record.canvasJsonPath, { headers: blobHeaders }).catch(() => null);
+  const blobRes = await fetch(record.canvasJsonPath, {
+    headers: blobHeaders,
+  }).catch(() => null);
   if (!blobRes?.ok) {
     return Response.json({ nodes: [], edges: [] });
   }
@@ -78,18 +80,26 @@ export async function PUT(
     return Response.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
+  if (
+    !body ||
+    typeof body !== "object" ||
+    !Array.isArray((body as { nodes?: unknown }).nodes) ||
+    !Array.isArray((body as { edges?: unknown }).edges)
+  ) {
+    return Response.json(
+      { error: "Canvas payload must include nodes and edges arrays" },
+      { status: 400 },
+    );
+  }
+
   let blob;
   try {
-    blob = await put(
-      `canvas/${projectId}.json`,
-      JSON.stringify(body),
-      {
-        access: "private",
-        contentType: "application/json",
-        addRandomSuffix: false,
-        allowOverwrite: true,
-      },
-    );
+    blob = await put(`canvas/${projectId}.json`, JSON.stringify(body), {
+      access: "private",
+      contentType: "application/json",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+    });
   } catch (err) {
     console.error("[canvas PUT] Vercel Blob upload failed:", err);
     return Response.json(

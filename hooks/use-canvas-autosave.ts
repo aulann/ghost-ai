@@ -19,6 +19,8 @@ export function useCanvasAutosave({
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isFirstRender = useRef(true);
+  const isSavingRef = useRef(false);
+  const pendingSaveRef = useRef(false);
 
   // Always-current refs so the stable save() never closes over stale values
   const onStatusChangeRef = useRef(onStatusChange);
@@ -31,8 +33,14 @@ export function useCanvasAutosave({
   useEffect(() => { edgesRef.current = edges; });
   useEffect(() => { projectIdRef.current = projectId; });
 
-  // Core save logic — reads from refs so it can be called from a stable callback
+  // Core save logic — serialized: if a save is already in flight, mark pending
+  // and return; the in-flight save will re-run with the latest state on completion.
   const doSave = useRef(async () => {
+    if (isSavingRef.current) {
+      pendingSaveRef.current = true;
+      return;
+    }
+    isSavingRef.current = true;
     onStatusChangeRef.current("saving");
     if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
     try {
@@ -46,12 +54,22 @@ export function useCanvasAutosave({
     } catch {
       onStatusChangeRef.current("error");
     }
+    isSavingRef.current = false;
     resetTimerRef.current = setTimeout(() => onStatusChangeRef.current("idle"), 2000);
+    if (pendingSaveRef.current) {
+      pendingSaveRef.current = false;
+      doSave.current();
+    }
   });
 
-  // Manual save — cancels any pending debounce and saves immediately
+  // Manual save — cancels any pending debounce; if a save is in flight, mark
+  // pending so the latest state is saved as soon as the current one completes.
   const save = useCallback(async () => {
     if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    if (isSavingRef.current) {
+      pendingSaveRef.current = true;
+      return;
+    }
     await doSave.current();
   }, []);
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 import { EditorNavbar } from "@/components/editor/editor-navbar";
@@ -47,6 +47,12 @@ export function EditorShell({
     saveFnRef.current = fn;
   }, []);
   const triggerSave = useCallback(() => saveFnRef.current?.(), []);
+
+  // Clear stale save callback immediately when the active project changes,
+  // before the old CanvasFlow has a chance to unmount and clean up itself.
+  useEffect(() => {
+    saveFnRef.current = null;
+  }, [activeProjectId]);
 
   return (
     <ProjectDialogContext.Provider value={{ openCreate: actions.openCreate }}>
