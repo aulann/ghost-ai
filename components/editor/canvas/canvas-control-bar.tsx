@@ -23,22 +23,25 @@ export function CanvasControlBar({ rfInstance }: CanvasControlBarProps) {
     <div className="flex items-center gap-1 rounded-full border border-surface-border bg-surface px-3 py-2 shadow-lg">
       <button
         onClick={() => rfInstance?.zoomOut({ duration: 200 })}
+        disabled={!rfInstance}
         title="Zoom out"
-        className="flex h-8 w-8 items-center justify-center rounded-xl text-copy-muted transition-colors hover:bg-elevated hover:text-copy-primary"
+        className="flex h-8 w-8 items-center justify-center rounded-xl text-copy-muted transition-colors hover:bg-elevated hover:text-copy-primary disabled:pointer-events-none disabled:opacity-30"
       >
         <ZoomOut className="h-4 w-4" />
       </button>
       <button
         onClick={() => rfInstance?.fitView({ duration: 300 })}
+        disabled={!rfInstance}
         title="Fit view"
-        className="flex h-8 w-8 items-center justify-center rounded-xl text-copy-muted transition-colors hover:bg-elevated hover:text-copy-primary"
+        className="flex h-8 w-8 items-center justify-center rounded-xl text-copy-muted transition-colors hover:bg-elevated hover:text-copy-primary disabled:pointer-events-none disabled:opacity-30"
       >
         <Maximize2 className="h-4 w-4" />
       </button>
       <button
         onClick={() => rfInstance?.zoomIn({ duration: 200 })}
+        disabled={!rfInstance}
         title="Zoom in"
-        className="flex h-8 w-8 items-center justify-center rounded-xl text-copy-muted transition-colors hover:bg-elevated hover:text-copy-primary"
+        className="flex h-8 w-8 items-center justify-center rounded-xl text-copy-muted transition-colors hover:bg-elevated hover:text-copy-primary disabled:pointer-events-none disabled:opacity-30"
       >
         <ZoomIn className="h-4 w-4" />
       </button>

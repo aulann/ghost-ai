@@ -37,7 +37,6 @@ function nextNodeId(shape: string): string {
   return `${shape}-${crypto.randomUUID()}`;
 }
 
-
 export function CanvasFlow() {
   const { nodes, edges, onNodesChange, onEdgesChange, onConnect, onDelete } =
     useLiveblocksFlow<CanvasNode, CanvasEdge>({
@@ -59,12 +58,22 @@ export function CanvasFlow() {
 
   const handleImportTemplate = useCallback(
     (template: CanvasTemplate) => {
-      const removeNodes = nodes.map((nd) => ({ type: "remove" as const, id: nd.id }));
-      const removeEdges = edges.map((ed) => ({ type: "remove" as const, id: ed.id }));
+      const removeNodes = nodes.map((nd) => ({
+        type: "remove" as const,
+        id: nd.id,
+      }));
+      const removeEdges = edges.map((ed) => ({
+        type: "remove" as const,
+        id: ed.id,
+      }));
       if (removeNodes.length) onNodesChange(removeNodes);
       if (removeEdges.length) onEdgesChange(removeEdges);
-      onNodesChange(template.nodes.map((nd) => ({ type: "add" as const, item: nd })));
-      onEdgesChange(template.edges.map((ed) => ({ type: "add" as const, item: ed })));
+      onNodesChange(
+        template.nodes.map((nd) => ({ type: "add" as const, item: nd })),
+      );
+      onEdgesChange(
+        template.edges.map((ed) => ({ type: "add" as const, item: ed })),
+      );
       closeTemplates();
       setTimeout(() => rfInstance?.fitView({ duration: 400 }), 100);
     },
@@ -101,7 +110,7 @@ export function CanvasFlow() {
       const MAX_NODE_SIZE = 2000;
       if (
         typeof shape !== "string" ||
-        !(shape in SHAPE_DEFAULTS) ||
+        !Object.prototype.hasOwnProperty.call(SHAPE_DEFAULTS, shape) ||
         !Number.isFinite(width) ||
         width <= 0 ||
         width > MAX_NODE_SIZE ||
@@ -140,11 +149,11 @@ export function CanvasFlow() {
   return (
     <CanvasCallbacksCtx.Provider value={onNodesChange}>
       <CanvasEdgeCallbacksCtx.Provider value={onEdgesChange}>
-      <StarterTemplatesModal
-        open={templatesOpen}
-        onClose={closeTemplates}
-        onImport={handleImportTemplate}
-      />
+        <StarterTemplatesModal
+          open={templatesOpen}
+          onClose={closeTemplates}
+          onImport={handleImportTemplate}
+        />
         <ReactFlow<CanvasNode, CanvasEdge>
           nodes={nodes}
           edges={edges}

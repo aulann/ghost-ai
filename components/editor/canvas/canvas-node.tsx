@@ -124,6 +124,8 @@ function ColorSwatch({
 
   return (
     <button
+      aria-label={`Node color ${fill}`}
+      aria-pressed={isSelected}
       style={{
         backgroundColor: fill,
         outline: isSelected ? `2px solid ${text}` : "none",
