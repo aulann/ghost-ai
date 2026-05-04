@@ -26,5 +26,5 @@ export default async function WorkspacePage({ params }: WorkspacePageProps) {
     return <AccessDenied />;
   }
 
-  return <WorkspaceShell projectName={project.name} />;
+  return <WorkspaceShell projectName={project.name} roomId={roomId} />;
 }

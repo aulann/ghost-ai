@@ -18,7 +18,7 @@ Collaborators are stored by email in the database.
 
 Use Clerk Backedn API to enrich collaborator email with:
 
-- dispaly name
+- display name
 - avatar image
 
 If a Clerk user is not found for an email, fall back to showing the email only.

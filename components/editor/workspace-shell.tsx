@@ -1,15 +1,17 @@
 "use client";
 
 import { useEffect } from "react";
-import { Bot, Settings2, Sparkles, Workflow } from "lucide-react";
+import { Bot, Settings2, Sparkles } from "lucide-react";
 
 import { useWorkspace } from "@/components/editor/workspace-context";
+import { CanvasWrapper } from "@/components/editor/canvas/canvas-wrapper";
 
 interface WorkspaceShellProps {
   projectName: string;
+  roomId: string;
 }
 
-export function WorkspaceShell({ projectName }: WorkspaceShellProps) {
+export function WorkspaceShell({ projectName, roomId }: WorkspaceShellProps) {
   const { setProjectName, aiOpen } = useWorkspace();
 
   useEffect(() => {
@@ -19,23 +21,8 @@ export function WorkspaceShell({ projectName }: WorkspaceShellProps) {
 
   return (
     <div className="flex flex-1 overflow-hidden">
-      <div className="flex flex-1 flex-col items-center justify-center gap-6 bg-base">
-        <div className="flex h-16 w-16 items-center justify-center rounded-2xl border border-surface-border bg-elevated">
-          <Workflow className="h-8 w-8 text-copy-muted" />
-        </div>
-        <div className="max-w-md text-center">
-          <p className="mb-3 text-xs font-medium uppercase tracking-widest text-copy-faint">
-            Workspace Shell
-          </p>
-          <h2 className="mb-3 text-2xl font-semibold text-copy-primary">
-            Canvas and collaboration tooling land here next.
-          </h2>
-          <p className="text-sm leading-relaxed text-copy-muted">
-            This room is ready for the shared architecture canvas, durable AI
-            workflows, and real-time presence. For now, the shell is wired with
-            project context and navigation only.
-          </p>
-        </div>
+      <div className="flex flex-1 overflow-hidden">
+        <CanvasWrapper roomId={roomId} />
       </div>
 
       {aiOpen && (
