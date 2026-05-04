@@ -9,10 +9,9 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-/context/current-issues.md
 /.agents
 /.claude
-/context
+
 
 # testing
 /coverage

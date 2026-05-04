@@ -1,10 +1,21 @@
 "use client";
 
-import { LayoutTemplate, PanelLeftClose, PanelLeftOpen, Share2, Sparkles } from "lucide-react";
+import {
+  AlertCircle,
+  Check,
+  LayoutTemplate,
+  Loader2,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Save,
+  Share2,
+  Sparkles,
+} from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import type { SaveStatus } from "@/hooks/use-canvas-autosave";
 
 interface EditorNavbarProps {
   isOpen: boolean;
@@ -14,6 +25,8 @@ interface EditorNavbarProps {
   onAiToggle?: () => void;
   onShareOpen?: () => void;
   onTemplatesOpen?: () => void;
+  saveStatus?: SaveStatus;
+  onSave?: () => void;
 }
 
 export function EditorNavbar({
@@ -24,7 +37,13 @@ export function EditorNavbar({
   onAiToggle,
   onShareOpen,
   onTemplatesOpen,
+  saveStatus,
+  onSave,
 }: EditorNavbarProps) {
+  const isSaving = saveStatus === "saving";
+  const isSaved = saveStatus === "saved";
+  const isError = saveStatus === "error";
+
   return (
     <header className="flex h-12 shrink-0 items-center border-b border-surface-border bg-surface px-3">
       <div className="flex min-w-0 flex-1 items-center gap-2">
@@ -56,14 +75,35 @@ export function EditorNavbar({
         {projectName && (
           <>
             <Button
-              variant="ghost"
+              variant="outline"
+              size="sm"
+              onClick={onSave}
+              disabled={isSaving}
+              className={cn(
+                "w-22 gap-1.5",
+                isSaved && "border-brand/50 text-brand",
+                isError && "border-red-500/50 text-red-400",
+              )}
+            >
+              {isSaving && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+              {isSaved && <Check className="h-3.5 w-3.5" />}
+              {isError && <AlertCircle className="h-3.5 w-3.5" />}
+              {!isSaving && !isSaved && !isError && (
+                <Save className="h-3.5 w-3.5" />
+              )}
+              {isSaving ? "Saving…" : isSaved ? "Saved" : isError ? "Error" : "Save"}
+            </Button>
+
+            <Button
+              variant="outline"
               size="sm"
               onClick={onTemplatesOpen}
-              className="gap-1.5 text-copy-muted hover:bg-elevated hover:text-copy-primary"
+              className="gap-1.5"
             >
               <LayoutTemplate className="h-4 w-4" />
               Templates
             </Button>
+
             <Button
               variant="outline"
               size="sm"
@@ -73,24 +113,20 @@ export function EditorNavbar({
               <Share2 className="h-4 w-4" />
               Share
             </Button>
+
             <Button
-              variant="ghost"
+              variant="default"
               size="sm"
               onClick={onAiToggle}
               aria-pressed={!!aiOpen}
-              className={cn(
-                "gap-1.5",
-                aiOpen
-                  ? "bg-ai-dim text-ai-text hover:bg-ai-dim"
-                  : "text-copy-muted hover:bg-elevated hover:text-ai-text",
-              )}
+              className="gap-1.5"
             >
               <Sparkles className="h-4 w-4" />
               AI
             </Button>
           </>
         )}
-        <UserButton />
+        {!projectName && <UserButton />}
       </div>
     </header>
   );
