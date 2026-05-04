@@ -85,13 +85,20 @@ export async function listProjectAccessMembers(
   });
 
   const emailLookup = await getClerkUserLookup(
-    Array.from(new Set(collaborators.map((collaborator) => collaborator.email))),
+    Array.from(
+      new Set(
+        collaborators
+          .map((c) => normalizeEmail(c.email))
+          .filter((e): e is string => e !== null),
+      ),
+    ),
   );
 
   const owner = await getProjectOwner(ownerId);
 
   const collaboratorMembers = collaborators.map((collaborator) => {
-    const clerkUser = emailLookup.get(collaborator.email);
+    const normalizedEmail = normalizeEmail(collaborator.email);
+    const clerkUser = normalizedEmail ? emailLookup.get(normalizedEmail) : undefined;
 
     return {
       id: collaborator.id,

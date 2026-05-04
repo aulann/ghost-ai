@@ -32,6 +32,7 @@ export function EditorShell({
   >(null);
   const [aiOpen, setAiOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [templatesOpen, setTemplatesOpen] = useState(false);
   const actions = useProjectActions();
   const activeProjectId = pathname.startsWith("/editor/")
     ? pathname.split("/")[2] || null
@@ -44,6 +45,9 @@ export function EditorShell({
           setProjectName: setWorkspaceProjectName,
           aiOpen,
           toggleAi: () => setAiOpen((v) => !v),
+          templatesOpen,
+          openTemplates: () => setTemplatesOpen(true),
+          closeTemplates: () => setTemplatesOpen(false),
         }}
       >
         <div className="flex h-screen flex-col overflow-hidden bg-base">
@@ -54,6 +58,7 @@ export function EditorShell({
             aiOpen={aiOpen}
             onAiToggle={() => setAiOpen((v) => !v)}
             onShareOpen={() => setShareOpen(true)}
+            onTemplatesOpen={() => setTemplatesOpen(true)}
           />
           <div className="relative flex flex-1 overflow-hidden">
             <ProjectSidebar

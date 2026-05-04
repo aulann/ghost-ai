@@ -2,7 +2,10 @@ import { currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import { getLiveblocks, getUserCursorColor } from "@/lib/liveblocks";
-import { getCurrentUserIdentity, getAccessibleProject } from "@/lib/project-access";
+import {
+  getCurrentUserIdentity,
+  getAccessibleProject,
+} from "@/lib/project-access";
 
 export async function POST(request: Request) {
   const user = await currentUser();
@@ -10,8 +13,22 @@ export async function POST(request: Request) {
     return new NextResponse(null, { status: 401 });
   }
 
-  const { room } = await request.json();
-  if (typeof room !== "string" || !room) {
+  let parsed: unknown;
+  try {
+    parsed = await request.json();
+  } catch {
+    return new NextResponse(null, { status: 400 });
+  }
+
+  if (
+    parsed === null ||
+    typeof parsed !== "object" ||
+    typeof (parsed as Record<string, unknown>).room !== "string"
+  ) {
+    return new NextResponse(null, { status: 400 });
+  }
+  const room = ((parsed as Record<string, unknown>).room as string).trim();
+  if (!room) {
     return new NextResponse(null, { status: 400 });
   }
 
@@ -20,7 +37,11 @@ export async function POST(request: Request) {
     return new NextResponse(null, { status: 401 });
   }
 
-  const project = await getAccessibleProject(room, identity.userId, identity.primaryEmail);
+  const project = await getAccessibleProject(
+    room,
+    identity.userId,
+    identity.primaryEmail,
+  );
   if (!project) {
     return new NextResponse(null, { status: 403 });
   }
